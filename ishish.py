@@ -29,10 +29,7 @@ def better_time(text):
 g = github.Github()
 
 
-if re.search(" ", AUTH_CHATS):
-    GB_grps = AUTH_CHATS.split(" ")
-else:
-    GB_grps = AUTH_CHATS
+GB_grps = AUTH_CHATS.split(" ") if re.search(" ", AUTH_CHATS) else AUTH_CHATS
 
 
 def better_time(text):
@@ -66,7 +63,7 @@ async def send_msg(chat, text, buttons=None, **kwargs):
                 await tgbot.send_message(
                     int(ch), txt, link_preview=link_preview, parse_mode=parse_mode
                 )
-    elif isinstance(chat, str) or isinstance(chat, int):
+    elif isinstance(chat, (str, int)):
         if buttons is not None:
             await tgbot.send_message(
                 int(chat),
@@ -98,15 +95,9 @@ async def fucku(event):
 @tgbot.on(events.CallbackQuery(pattern="pr_count"))
 async def pcount(event):
     repo = g.get_repo("TeamUltroid/Ultroid")
-    open_pr_count = 0
-    closed_pr_count = 0
-    total_prs = 0
-    for r in repo.get_pulls(state="open"):
-        open_pr_count += 1
-    for r in repo.get_pulls(state="closed"):
-        closed_pr_count += 1
-    for r in repo.get_pulls(state="all"):
-        total_prs += 1
+    open_pr_count = sum(1 for _ in repo.get_pulls(state="open"))
+    closed_pr_count = sum(1 for _ in repo.get_pulls(state="closed"))
+    total_prs = sum(1 for _ in repo.get_pulls(state="all"))
     await event.answer(
         f"Total Open Pull Requests are {open_pr_count}.\nTotal Closed Pull Requests are {closed_pr_count}\n\nTotal Pull Requests are {total_prs}",
         alert=True,
@@ -125,9 +116,7 @@ async def pcount(event):
 @tgbot.on(events.CallbackQuery(pattern="issue_count"))
 async def pcount(event):
     repo = g.get_repo("TeamUltroid/Ultroid")
-    issue_count = 0
-    for r in repo.get_issues(state="open"):
-        issue_count += 1
+    issue_count = sum(1 for _ in repo.get_issues(state="open"))
     await event.answer(f"Total Open Issues are: {issue_count}", alert=True)
 
 
